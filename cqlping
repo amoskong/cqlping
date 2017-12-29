@@ -79,7 +79,7 @@ def do_cql_ping(size, ttl):
 
 if __name__ == "__main__":
 
-    parser = argparse.ArgumentParser(description="CQLPing")
+    parser = argparse.ArgumentParser(description="CQLPing - Simple CQL I/O latency monitoring tool")
     parser.add_argument('--debug', action="store_true", help="Enable debug mode")
     parser.add_argument('-c', action="store", help="Stop after sending count ECHO_REQUEST packets", default=4)
     parser.add_argument('-i', action="store", help="Wait interval seconds between each sending packet", default=1)

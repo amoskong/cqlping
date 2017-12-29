@@ -11,17 +11,18 @@ Help:
 .. code:: sh
 
     $ cqlping --help
-    usage: cqlping [-h] [-c C] [-i I] [--cqlport CQLPORT] [--cqluser CQLUSER]
-                   [--cqlpwd CQLPWD] [-t T] [-s S]
+    usage: cqlping [-h] [--debug] [-c C] [-i I] [--cqlport CQLPORT]
+                   [--cqluser CQLUSER] [--cqlpwd CQLPWD] [-t T] [-s S]
                    destination
 
-    CQLPing
+    CQLPing - Simple CQL I/O latency monitoring tool
 
     positional arguments:
       destination        CqlPing packet destination
 
     optional arguments:
       -h, --help         show this help message and exit
+      --debug            Enable debug mode
       -c C               Stop after sending count ECHO_REQUEST packets
       -i I               Wait interval seconds between each sending packet
       --cqlport CQLPORT  CQL port
