@@ -73,3 +73,31 @@ Example:
     cqlping DEBUG: reply data length: 6
     cqlping DEBUG: [Row(key='1', C0='REJSM11C', C1=None, C2=None, C3=None, C4=None)]
     cqlping INFO: 24 bytes scylla-server (127.0.0.1) seq=2 ttl=64 time=0.198 ms
+
+Packet Size:
+-----------
+.. code:: sh
+
+    If you assign packet size by `-s` and `request-query` parameter contains a '%s',
+    it will generate a fixed-size random string and append to request-query cmd.
+    It means table must contains a `blob`, `text` or `varchar` column.
+
+    Blob: -s 20 --request-query "INSERT INTO cqlping.cf (key1, val) VALUES (1, textAsBlob('%s'))"
+    Text: -s 20 --request-query "INSERT INTO cqlping.cf (key1, val) VALUES (1, '%s')"
+    Varchar: -s 20 --request-query "INSERT INTO cqlping.cf (key1, val) VALUES (1, '%s')"
+
+.. code:: sh
+
+    If `-s` isn't assigned, it will directly execute assigned request-query,
+    the packet size is depends on the query content.
+
+    Blob: --request-query "INSERT INTO cqlping.cf (key1, val) VALUES (1, textAsBlob('hello'))"
+    Text: --request-query "INSERT INTO cqlping.cf (key1, val) VALUES (1, 'hello')"
+    Varchar: --request-query "INSERT INTO cqlping.cf (key1, val) VALUES (1, 'hello')"
+    More: --request-query "INSERT INTO cqlping.cf (key1, key2, val, val2) VALUES (1, 'k2', 'hello', 'val2-val2-val2')"
+
+
+Project:
+-------
+
+https://github.com/amoskong/cqlping
