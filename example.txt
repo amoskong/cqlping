@@ -10,13 +10,15 @@ $ cqlping scylla-server
   64 bytes scylla-server (127.0.0.1) seq=3 ttl=64 time=0.300 ms
   64 bytes scylla-server (127.0.0.1) seq=4 ttl=64 time=0.300 ms
 
-2. Prepare a test Keyspace (it can be existing keyspace)
+2.1 Prepare a test Keyspace (it can be existing keyspace)
 
    CREATE KEYSPACE IF NOT EXISTS cqlping WITH replication = {'class':'SimpleStrategy', 'replication_factor':1};
 
-3. Create test tables (they can be existing tables)
+2.2 Create test tables (they can be existing tables)
 
-3.0 Test with keyspace1.standard1 created by C*-stress
+3.1 Test with keyspace1.standard1 created by C*-stress
+
+3.1.1 test with random string
 
 $ cqlping scylla-server \
   --request-query "INSERT INTO keyspace1.standard1 (key,\"C0\") VALUES (textAsBlob('1'), textAsBlob('%s'))" \
@@ -34,6 +36,8 @@ $ cqlping scylla-server \
       cqlping DEBUG: reply data length: 11
   cqlping INFO: 11 bytes scylla-server (127.0.0.1) seq=2 ttl=64 time=0.292 ms
 
+3.1.2 test with fixed string
+
 $ cqlping scylla-server \
   --request-query "INSERT INTO keyspace1.standard1 (key,\"C0\") VALUES (textAsBlob('1'), textAsBlob('hello'))" \
   --reply-query "select * from keyspace1.standard1 where key=textAsBlob('1')" -c 2 --debug
@@ -46,26 +50,31 @@ $ cqlping scylla-server \
   cqlping INFO: 6 bytes scylla-server (127.0.0.1) seq=1 ttl=64 time=0.300 ms
 
 
-3.1 CREATE TABLE IF NOT EXISTS cqlping.cf_txt (key1 bigint, val text, PRIMARY KEY(key1));
+3.2.1 test with text Column
+
+  CREATE TABLE IF NOT EXISTS cqlping.cf_txt (key1 bigint, val text, PRIMARY KEY(key1));
 
 $ cqlping scylla-server \
-  --request-query "INSERT INTO cqlping.cf_vchar (key1, val) VALUES (1, '%s')" \
-  --reply-query "select * from cqlping.cf_vchar where key1=1" -c 2 -s 2 --debug
+  --request-query "INSERT INTO cqlping.cf_txt (key1, val) VALUES (1, '%s')" \
+  --reply-query "select * from cqlping.cf_txt where key1=1" -c 2 -s 2 --debug
 
   cqlping INFO: CQLPing scylla-server (127.0.0.1), preparing...
-      cqlping DEBUG: INSERT INTO cqlping.cf_vchar (key1, val) VALUES (1, 'AH')
-      cqlping DEBUG: select * from cqlping.cf_vchar where key1=1
-      cqlping DEBUG: [Row(key1=1, val=u'AH')]
+      cqlping DEBUG: INSERT INTO cqlping.cf_txt (key1, val) VALUES (1, '75')
+      cqlping DEBUG: select * from cqlping.cf_txt where key1=1
+      cqlping DEBUG: [Row(key1=1, val=u'75')]
       cqlping DEBUG: reply data length: 4
-  cqlping INFO: 4 bytes scylla-server (127.0.0.1) seq=1 ttl=64 time=0.303 ms
-      cqlping DEBUG: INSERT INTO cqlping.cf_vchar (key1, val) VALUES (1, '23')
-      cqlping DEBUG: select * from cqlping.cf_vchar where key1=1
-      cqlping DEBUG: [Row(key1=1, val=u'23')]
+  cqlping INFO: 4 bytes scylla-server (127.0.0.1) seq=1 ttl=64 time=0.292 ms
+      cqlping DEBUG: INSERT INTO cqlping.cf_txt (key1, val) VALUES (1, '00')
+      cqlping DEBUG: select * from cqlping.cf_txt where key1=1
+      cqlping DEBUG: [Row(key1=1, val=u'00')]
       cqlping DEBUG: reply data length: 4
-  cqlping INFO: 4 bytes scylla-server (127.0.0.1) seq=2 ttl=64 time=0.301 ms
+  cqlping INFO: 4 bytes scylla-server (127.0.0.1) seq=2 ttl=64 time=0.292 ms
 
 
-2.2 CREATE TABLE IF NOT EXISTS cqlping.cf_blob (key1 bigint, val blob, PRIMARY KEY(key1));
+
+3.2.2 test with blob Column
+
+  CREATE TABLE IF NOT EXISTS cqlping.cf_blob (key1 bigint, val blob, PRIMARY KEY(key1));
 
 $ cqlping scylla-server \
   --request-query "INSERT INTO cqlping.cf_blob (key1, val) VALUES (1, textAsBlob('%s'))" \
@@ -84,21 +93,22 @@ $ cqlping scylla-server \
   cqlping INFO: 4 bytes scylla-server (127.0.0.1) seq=2 ttl=64 time=0.298 ms
 
 
-3.3 CREATE TABLE IF NOT EXISTS cqlping.cf_varchar (key1 bigint, val varchar, PRIMARY KEY(key1));
+3.2.3 test with varchar Column
+
+  CREATE TABLE IF NOT EXISTS cqlping.cf_varchar (key1 bigint, val varchar, PRIMARY KEY(key1));
 
 $ cqlping scylla-server \
-  --request-query "INSERT INTO cqlping.cf_txt (key1, val) VALUES (1, '%s')" \
-  --reply-query "select * from cqlping.cf_txt where key1=1" -c 2 -s 2 --debug
+  --request-query "INSERT INTO cqlping.cf_vchar (key1, val) VALUES (1, '%s')" \
+  --reply-query "select * from cqlping.cf_vchar where key1=1" -c 2 -s 2 --debug
 
   cqlping INFO: CQLPing scylla-server (127.0.0.1), preparing...
-      cqlping DEBUG: INSERT INTO cqlping.cf_txt (key1, val) VALUES (1, '75')
-      cqlping DEBUG: select * from cqlping.cf_txt where key1=1
-      cqlping DEBUG: [Row(key1=1, val=u'75')]
+      cqlping DEBUG: INSERT INTO cqlping.cf_vchar (key1, val) VALUES (1, 'AH')
+      cqlping DEBUG: select * from cqlping.cf_vchar where key1=1
+      cqlping DEBUG: [Row(key1=1, val=u'AH')]
       cqlping DEBUG: reply data length: 4
-  cqlping INFO: 4 bytes scylla-server (127.0.0.1) seq=1 ttl=64 time=0.292 ms
-      cqlping DEBUG: INSERT INTO cqlping.cf_txt (key1, val) VALUES (1, '00')
-      cqlping DEBUG: select * from cqlping.cf_txt where key1=1
-      cqlping DEBUG: [Row(key1=1, val=u'00')]
+  cqlping INFO: 4 bytes scylla-server (127.0.0.1) seq=1 ttl=64 time=0.303 ms
+      cqlping DEBUG: INSERT INTO cqlping.cf_vchar (key1, val) VALUES (1, '23')
+      cqlping DEBUG: select * from cqlping.cf_vchar where key1=1
+      cqlping DEBUG: [Row(key1=1, val=u'23')]
       cqlping DEBUG: reply data length: 4
-  cqlping INFO: 4 bytes scylla-server (127.0.0.1) seq=2 ttl=64 time=0.292 ms
-
+  cqlping INFO: 4 bytes scylla-server (127.0.0.1) seq=2 ttl=64 time=0.301 ms
