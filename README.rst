@@ -46,16 +46,21 @@ Default Schema:
 
 CQLPing creates a keyspace `cqlping` and table `cf` (key1 bigint, key2 bigint,
 val blob, PRIMARY KEY(key1, key2)). It convert current time to two integers,
-and use them as primary key. The blob val will be assigned a random string,
-the size is decided by `-s` argument (default: 60)
+and use them as primary key. So each ping will increase a new row.
 
-Plus the two bigint, so the default reply packet size is 64 bytes.
+The blob val will be assigned a random string, the size is decided by `-s`
+argument (default: 60). Plus the two bigint, so the default reply packet size
+is 64 bytes.
 
 Use existing schema:
 -------------------
 
 We must assign `request-query` and `reply-query` arguments for using existing
 schema.
+
+Current code always update one row with hardcode primary key in query arguments,
+the other columns can also be hardcode, then the packet size is fixed, and we can't
+use `-s` at the same time.
 
 If you want to use a random string for each insert request, you can use '%s',
 cqlping will generate a fixed-size random string, and append to request-query
