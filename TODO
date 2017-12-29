@@ -1,0 +1,6 @@
+
+1. packet size (header + body(all columns)):
+
+If user don't use random string and veiry-query isn't used,
+we need to get the packet size from first query.
+

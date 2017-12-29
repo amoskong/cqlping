@@ -30,16 +30,22 @@ cqlping --help
       -h, --help            show this help message and exit
       --debug               Enable debug mode (only for developer)
       -c C                  Stop after sending count ECHO_REQUEST packets
+                            (default: 4)
       -i I                  Wait interval seconds between each sending packet
-      --cqlport CQLPORT     CQL port
-      --cqluser CQLUSER     CQL username
-      --cqlpwd CQLPWD       CQL password
+                            (default: 1s)
+      --cqlport CQLPORT     (Optional) CQL port (default: 9042)
+      --cqluser CQLUSER     (Optional) CQL username
+      --cqlpwd CQLPWD       (Optional) CQL password
       --request-query REQUEST_QUERY
-                            Request query for using existing schema
+                            (Optional) Request query for using existing schema
       --verify-query VERIFY_QUERY
-                            Reply query for using exiting schema
-      -t T                  Time to live
-      -s S                  (Optional) Size of random packet
+                            (Optional) Verify the
+                            write(INSERT/UPDATE/DELETE/ALTER) operate result by a
+                            SELECT when use exiting schema. Only used for debug
+                            mode
+      -t T                  Time to live (default: 64)
+      -s S                  (Optional) Size of random packet (default: 60)
+
 
 Default Schema:
 --------------

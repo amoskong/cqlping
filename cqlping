@@ -111,6 +111,7 @@ def do_cql_ping(size, ttl, request_query=None, verify_query=None):
         logger.debug('Verify data length: %d', get_packet_size(rows[0]))
         ret_size = get_packet_size(rows[0])
     else:
+        #FIXME: packet size should contain header + body(all columns)
         ret_size = data_size
 
     return ret_size
