@@ -6,7 +6,17 @@ About:
 
 Simple CQL I/O latency monitoring tool
 
-https://github.com/amoskong/cqlping
+
+Install:
+--------
+
+.. code:: sh
+
+    # git clone https://github.com/amoskong/cqlping
+    # cd cqlping/
+    # sudo pip install -r requirements.txt
+    # ./cqlping --help
+    # ./cqlping localhost
 
 Help:
 ----
