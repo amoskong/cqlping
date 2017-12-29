@@ -69,7 +69,7 @@ def get_packet_size(row):
             l += len(i)
     return l
 
-def do_cql_ping(size, ttl, request_query=None, reply_query=None):
+def do_cql_ping(size, ttl, request_query=None, verify_query=None):
     global _session
 
     # a pair of integers, whose ratio is exactly equal to the original float
@@ -91,13 +91,12 @@ def do_cql_ping(size, ttl, request_query=None, reply_query=None):
     logger.debug(request_query)
     _session.execute(request_query)
 
-    # pong reply
-    if reply_query is None:
-        reply_query = 'select * from cqlping.cf where key1 = %s and key2 = %s' % (time_int1, time_int2)
-    logger.debug(reply_query)
-    ret = _session.execute(reply_query)
-    #help(ret)
-    rows = list(_session.execute(reply_query))
+    # verify result of writing
+    if verify_query is None:
+        verify_query = 'select * from cqlping.cf where key1 = %s and key2 = %s' % (time_int1, time_int2)
+    logger.debug(verify_query)
+    ret = _session.execute(verify_query)
+    rows = list(_session.execute(verify_query))
     logger.debug(rows)
     logger.debug('reply data length: %d', get_packet_size(rows[0]))
     return get_packet_size(rows[0])
@@ -113,7 +112,7 @@ if __name__ == "__main__":
     parser.add_argument('--cqluser', action="store", help="CQL username")
     parser.add_argument('--cqlpwd', action="store", help="CQL password")
     parser.add_argument('--request-query', action="store", help="Request query for using existing schema", default=None)
-    parser.add_argument('--reply-query', action="store", help="Reply query for using exiting schema", default=None)
+    parser.add_argument('--verify-query', action="store", help="(Optional) Verify the write(insert, update, delete) result by a select when use exiting schema", default=None)
     parser.add_argument('-t', action="store", help="Time to live", default=64) #FIXME: unimplement
     parser.add_argument('-s', action="store", help="(Optional) Size of random packet", default=None)
     parser.add_argument('destination', action="store", help="CqlPing packet destination", default='localhost')
@@ -134,10 +133,10 @@ if __name__ == "__main__":
 
     prepare_session(ip, port=int(args.cqlport), username=args.cqluser, password=args.cqlpwd)
 
-    if (args.request_query is None) ^ (args.reply_query is None):
-        logger.error("request-query and replay-query should be assigned together")
+    if (args.request_query is None) and (args.verify_query is not None):
+        logger.error("request-query must be assigned when replay-query has been assigned")
         sys.exit(1)
-    if args.request_query is None and args.reply_query is None:
+    if args.request_query is None and args.verify_query is None:
         logger.info("Prepare default schema cqlping.cf (key1 bigint, key2 bigint, val blob, PRIMARY KEY(key1, key2))")
         prepare_default_schema()
         if args.s is None:
@@ -155,7 +154,7 @@ if __name__ == "__main__":
         seq = 1
         for i in range(int(args.c)):
             start_time = time.time()
-            ret_size = do_cql_ping(data_size, int(args.t), args.request_query, args.reply_query)
+            ret_size = do_cql_ping(data_size, int(args.t), args.request_query, args.verify_query)
             delta = time.time() - start_time
             if delta < interval:
                 time.sleep(interval - delta)

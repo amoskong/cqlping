@@ -17,7 +17,7 @@ cqlping --help
 
     usage: cqlping [-h] [--debug] [-c C] [-i I] [--cqlport CQLPORT]
                    [--cqluser CQLUSER] [--cqlpwd CQLPWD]
-                   [--request-query REQUEST_QUERY] [--reply-query REPLY_QUERY]
+                   [--request-query REQUEST_QUERY] [--verify-query VERIFY_QUERY]
                    [-t T] [-s S]
                    destination
 
@@ -36,7 +36,7 @@ cqlping --help
       --cqlpwd CQLPWD       CQL password
       --request-query REQUEST_QUERY
                             Request query for using existing schema
-      --reply-query REPLY_QUERY
+      --verify-query VERIFY_QUERY
                             Reply query for using exiting schema
       -t T                  Time to live
       -s S                  (Optional) Size of random packet
@@ -49,13 +49,13 @@ val blob, PRIMARY KEY(key1, key2)). It convert current time to two integers,
 and use them as primary key. So each ping will increase a new row.
 
 The blob val will be assigned a random string, the size is decided by `-s`
-argument (default: 60). Plus the two bigint, so the default reply packet size
+argument (default: 60). Plus the two bigint, so the default verify packet size
 is 64 bytes.
 
 Use existing schema:
 -------------------
 
-We must assign `request-query` and `reply-query` arguments for using existing
+We must assign `request-query` and `verify-query` arguments for using existing
 schema.
 
 Current code always update one row with hardcode primary key in query arguments,
@@ -119,11 +119,11 @@ Found more examples in example.txt & test.sh
     cqlping DEBUG: [Row(key1=1588084343092317, key2=1048576, val='Q1FQR0CG9NUBDEN3HPEMXMP4DI03NYB7Z83FM7MJBFL74Y3ZDNCIB2M55J5BGZR4TKEP3393H0GS958P8Y0OQ60WW53DNUO6LQZ1')]
     cqlping INFO: 116 bytes scylla-server (127.0.0.1) seq=1 ttl=64 time=0.180 ms
 
-    $ cqlping --cqluser=cassandra --cqlpwd=cassandra -s 8 -c 1 -i 0.1 scylla-server --request-query "INSERT INTO keyspace1.standard1 (key,\"C0\") VALUES (textAsBlob('1'), textAsBlob('%s'))" --reply-query "select * from keyspace1.standard1 where key=textAsBlob('1')" --debug
+    $ cqlping --cqluser=cassandra --cqlpwd=cassandra -s 8 -c 1 -i 0.1 scylla-server --request-query "INSERT INTO keyspace1.standard1 (key,\"C0\") VALUES (textAsBlob('1'), textAsBlob('%s'))" --verify-query "select * from keyspace1.standard1 where key=textAsBlob('1')" --debug
     cqlping INFO: CQLPing scylla-server (127.0.0.1), preparing...
     cqlping DEBUG: INSERT INTO keyspace1.standard1 (key,"C0") VALUES (textAsBlob('1'), textAsBlob('CW6PZMH7'))
     cqlping DEBUG: select * from keyspace1.standard1 where key=textAsBlob('1')
-    cqlping DEBUG: reply data length: 6
+    cqlping DEBUG: verify data length: 6
     cqlping DEBUG: [Row(key='1', C0='CW6PZMH7', C1=None, C2=None, C3=None, C4=None)]
     cqlping INFO: 24 bytes scylla-server (127.0.0.1) seq=1 ttl=64 time=0.207 ms
 

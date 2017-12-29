@@ -22,31 +22,31 @@ $ cqlping scylla-server
 
 $ cqlping scylla-server \
   --request-query "INSERT INTO keyspace1.standard1 (key,\"C0\") VALUES (textAsBlob('1'), textAsBlob('%s'))" \
-  --reply-query "select * from keyspace1.standard1 where key=textAsBlob('1')" -c 2 -s 10 --debug
+  --verify-query "select * from keyspace1.standard1 where key=textAsBlob('1')" -c 2 -s 10 --debug
 
   cqlping INFO: CQLPing scylla-server (127.0.0.1), preparing...
       cqlping DEBUG: INSERT INTO keyspace1.standard1 (key,"C0") VALUES (textAsBlob('1'), textAsBlob('LYXSMAHQER'))
       cqlping DEBUG: select * from keyspace1.standard1 where key=textAsBlob('1')
       cqlping DEBUG: [Row(key='1', C0='LYXSMAHQER', C1=None, C2=None, C3=None, C4=None)]
-      cqlping DEBUG: reply data length: 11
+      cqlping DEBUG: verify data length: 11
   cqlping INFO: 11 bytes scylla-server (127.0.0.1) seq=1 ttl=64 time=0.380 ms
       cqlping DEBUG: INSERT INTO keyspace1.standard1 (key,"C0") VALUES (textAsBlob('1'), textAsBlob('7ZADUT9K5T'))
       cqlping DEBUG: select * from keyspace1.standard1 where key=textAsBlob('1')
       cqlping DEBUG: [Row(key='1', C0='7ZADUT9K5T', C1=None, C2=None, C3=None, C4=None)]
-      cqlping DEBUG: reply data length: 11
+      cqlping DEBUG: verify data length: 11
   cqlping INFO: 11 bytes scylla-server (127.0.0.1) seq=2 ttl=64 time=0.292 ms
 
 3.1.2 test with fixed string
 
 $ cqlping scylla-server \
   --request-query "INSERT INTO keyspace1.standard1 (key,\"C0\") VALUES (textAsBlob('1'), textAsBlob('hello'))" \
-  --reply-query "select * from keyspace1.standard1 where key=textAsBlob('1')" -c 2 --debug
+  --verify-query "select * from keyspace1.standard1 where key=textAsBlob('1')" -c 2 --debug
 
   cqlping INFO: CQLPing scylla-server (127.0.0.1), preparing...
       cqlping DEBUG: INSERT INTO keyspace1.standard1 (key,"C0") VALUES (textAsBlob('1'), textAsBlob('hello'))
       cqlping DEBUG: select * from keyspace1.standard1 where key=textAsBlob('1')
       cqlping DEBUG: [Row(key='1', C0='hello', C1=None, C2=None, C3=None, C4=None)]
-      cqlping DEBUG: reply data length: 6
+      cqlping DEBUG: verify data length: 6
   cqlping INFO: 6 bytes scylla-server (127.0.0.1) seq=1 ttl=64 time=0.300 ms
 
 
@@ -56,18 +56,18 @@ $ cqlping scylla-server \
 
 $ cqlping scylla-server \
   --request-query "INSERT INTO cqlping.cf_txt (key1, val) VALUES (1, '%s')" \
-  --reply-query "select * from cqlping.cf_txt where key1=1" -c 2 -s 2 --debug
+  --verify-query "select * from cqlping.cf_txt where key1=1" -c 2 -s 2 --debug
 
   cqlping INFO: CQLPing scylla-server (127.0.0.1), preparing...
       cqlping DEBUG: INSERT INTO cqlping.cf_txt (key1, val) VALUES (1, '75')
       cqlping DEBUG: select * from cqlping.cf_txt where key1=1
       cqlping DEBUG: [Row(key1=1, val=u'75')]
-      cqlping DEBUG: reply data length: 4
+      cqlping DEBUG: verify data length: 4
   cqlping INFO: 4 bytes scylla-server (127.0.0.1) seq=1 ttl=64 time=0.292 ms
       cqlping DEBUG: INSERT INTO cqlping.cf_txt (key1, val) VALUES (1, '00')
       cqlping DEBUG: select * from cqlping.cf_txt where key1=1
       cqlping DEBUG: [Row(key1=1, val=u'00')]
-      cqlping DEBUG: reply data length: 4
+      cqlping DEBUG: verify data length: 4
   cqlping INFO: 4 bytes scylla-server (127.0.0.1) seq=2 ttl=64 time=0.292 ms
 
 
@@ -78,18 +78,18 @@ $ cqlping scylla-server \
 
 $ cqlping scylla-server \
   --request-query "INSERT INTO cqlping.cf_blob (key1, val) VALUES (1, textAsBlob('%s'))" \
-  --reply-query "select * from cqlping.cf_blob where key1=1" -c 2 -s 2 --debug
+  --verify-query "select * from cqlping.cf_blob where key1=1" -c 2 -s 2 --debug
 
   cqlping INFO: CQLPing scylla-server (127.0.0.1), preparing...
      cqlping DEBUG: INSERT INTO cqlping.cf_blob (key1, val) VALUES (1, textAsBlob('FQ'))
      cqlping DEBUG: select * from cqlping.cf_blob where key1=1
      cqlping DEBUG: [Row(key1=1, val='FQ')]
-     cqlping DEBUG: reply data length: 4
+     cqlping DEBUG: verify data length: 4
   cqlping INFO: 4 bytes scylla-server (127.0.0.1) seq=1 ttl=64 time=0.320 ms
      cqlping DEBUG: INSERT INTO cqlping.cf_blob (key1, val) VALUES (1, textAsBlob('O9'))
      cqlping DEBUG: select * from cqlping.cf_blob where key1=1
      cqlping DEBUG: [Row(key1=1, val='O9')]
-     cqlping DEBUG: reply data length: 4
+     cqlping DEBUG: verify data length: 4
   cqlping INFO: 4 bytes scylla-server (127.0.0.1) seq=2 ttl=64 time=0.298 ms
 
 
@@ -99,16 +99,16 @@ $ cqlping scylla-server \
 
 $ cqlping scylla-server \
   --request-query "INSERT INTO cqlping.cf_vchar (key1, val) VALUES (1, '%s')" \
-  --reply-query "select * from cqlping.cf_vchar where key1=1" -c 2 -s 2 --debug
+  --verify-query "select * from cqlping.cf_vchar where key1=1" -c 2 -s 2 --debug
 
   cqlping INFO: CQLPing scylla-server (127.0.0.1), preparing...
       cqlping DEBUG: INSERT INTO cqlping.cf_vchar (key1, val) VALUES (1, 'AH')
       cqlping DEBUG: select * from cqlping.cf_vchar where key1=1
       cqlping DEBUG: [Row(key1=1, val=u'AH')]
-      cqlping DEBUG: reply data length: 4
+      cqlping DEBUG: verify data length: 4
   cqlping INFO: 4 bytes scylla-server (127.0.0.1) seq=1 ttl=64 time=0.303 ms
       cqlping DEBUG: INSERT INTO cqlping.cf_vchar (key1, val) VALUES (1, '23')
       cqlping DEBUG: select * from cqlping.cf_vchar where key1=1
       cqlping DEBUG: [Row(key1=1, val=u'23')]
-      cqlping DEBUG: reply data length: 4
+      cqlping DEBUG: verify data length: 4
   cqlping INFO: 4 bytes scylla-server (127.0.0.1) seq=2 ttl=64 time=0.301 ms
