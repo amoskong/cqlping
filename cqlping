@@ -29,9 +29,6 @@ from cassandra.auth import PlainTextAuthProvider
 logger = logging.getLogger('cqlping')
 logger.setLevel(logging.INFO)
 handler = logging.StreamHandler(sys.stdout)
-#logger.setLevel(logging.DEBUG)
-#fmt = logging.Formatter(fmt='%(name)s %(levelname)s: %(message)s')
-#handler.setFormatter(fmt=fmt)
 logger.addHandler(handler)
 
 # Global connect session
@@ -68,19 +65,22 @@ def do_cql_ping(size, ttl):
 
     #query = "INSERT INTO cqlping.cf (key1, key2) VALUES (%s, %s)" % (time_int1, time_int2)
     blob_str = ''.join(random.choice(string.ascii_uppercase + string.digits) for _ in range(size))
-    query = "INSERT INTO cqlping.cf (key1, key2, val) VALUES (%s, %s, textAsBlob('%s'))" % (time_int1, time_int2, blob_str)
-    logger.debug(query)
 
     # ping request
+    query = "INSERT INTO cqlping.cf (key1, key2, val) VALUES (%s, %s, textAsBlob('%s'))" % (time_int1, time_int2, blob_str)
+    logger.debug(query)
     _session.execute(query)
 
     # pong reply
-    _session.execute('select * from cqlping.cf limit 1')
+    query = 'select * from cqlping.cf where key1 = %s and key2 = %s' % (time_int1, time_int2)
+    logger.debug(query)
+    logger.debug(list(_session.execute(query)))
 
 
 if __name__ == "__main__":
 
     parser = argparse.ArgumentParser(description="CQLPing")
+    parser.add_argument('--debug', action="store_true", help="Enable debug mode")
     parser.add_argument('-c', action="store", help="Stop after sending count ECHO_REQUEST packets", default=4)
     parser.add_argument('-i', action="store", help="Wait interval seconds between each sending packet", default=1)
     parser.add_argument('--cqlport', action="store", help="CQL port", default=9042)
@@ -90,6 +90,11 @@ if __name__ == "__main__":
     parser.add_argument('-s', action="store", help="Packet size", default=48)
     parser.add_argument('destination', action="store", help="CqlPing packet destination", default='localhost')
     args = parser.parse_args()
+
+    if args.debug:
+        logger.setLevel(logging.DEBUG)
+        fmt = logging.Formatter(fmt='%(name)s %(levelname)s: %(message)s')
+        handler.setFormatter(fmt=fmt)
 
     ip = socket.gethostbyname(args.destination)
 
@@ -108,8 +113,7 @@ if __name__ == "__main__":
         for i in range(int(args.c)):
             start_time = time.time()
             do_cql_ping(data_size, int(args.t))
-            end_time = time.time()
-            delta = end_time - start_time
+            delta = time.time() - start_time
             if delta < interval:
                 time.sleep(interval - delta)
             logger.info("%d bytes %s seq=%d ttl=%s time=%.3f ms" % (data_size + head_size, dest_str, seq, args.t, delta))

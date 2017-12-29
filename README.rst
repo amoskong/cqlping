@@ -41,8 +41,22 @@ Example:
     64 bytes scylla-server (127.0.0.1) seq=3 ttl=64 time=0.203 ms
     64 bytes scylla-server (127.0.0.1) seq=4 ttl=64 time=0.197 ms
 
-    $ cqlping --cqluser=cassandra --cqlpwd=cassandra -s 100 -c 2 -i 2 scylla-server
+    $ time cqlping --cqluser=cassandra --cqlpwd=cassandra -s 100 -c 5 -i 0.1 scylla-server
     CQLPing scylla-server (127.0.0.1), preparing...
-    116 bytes scylla-server (127.0.0.1) seq=1 ttl=64 time=0.187 ms
-    116 bytes scylla-server (127.0.0.1) seq=2 ttl=64 time=0.181 ms
+    116 bytes scylla-server (127.0.0.1) seq=1 ttl=64 time=0.189 ms
+    116 bytes scylla-server (127.0.0.1) seq=2 ttl=64 time=0.186 ms
+    116 bytes scylla-server (127.0.0.1) seq=3 ttl=64 time=0.188 ms
+    116 bytes scylla-server (127.0.0.1) seq=4 ttl=64 time=0.187 ms
+    116 bytes scylla-server (127.0.0.1) seq=5 ttl=64 time=0.189 ms
+
+    real	0m2.860s
+    user	0m0.257s
+    sys	0m0.105s
+
+    $ cqlping --cqluser=cassandra --cqlpwd=cassandra -s 100 -c 1 -i 0.1 scylla-server --debug
+    cqlping INFO: CQLPing scylla-server (127.0.0.1), preparing...
+    cqlping DEBUG: INSERT INTO cqlping.cf (key1, key2, val) VALUES (1588084343092317, 1048576, textAsBlob('Q1FQR0CG9NUBDEN3HPEMXMP4DI03NYB7Z83FM7MJBFL74Y3ZDNCIB2M55J5BGZR4TKEP3393H0GS958P8Y0OQ60WW53DNUO6LQZ1'))
+    cqlping DEBUG: select * from cqlping.cf where key1 = 1588084343092317 and key2 = 1048576
+    cqlping DEBUG: [Row(key1=1588084343092317, key2=1048576, val='Q1FQR0CG9NUBDEN3HPEMXMP4DI03NYB7Z83FM7MJBFL74Y3ZDNCIB2M55J5BGZR4TKEP3393H0GS958P8Y0OQ60WW53DNUO6LQZ1')]
+    cqlping INFO: 116 bytes scylla-server (127.0.0.1) seq=1 ttl=64 time=0.180 ms
 
