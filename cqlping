@@ -21,6 +21,9 @@ import random
 import string
 import logging
 
+from cassandra.policies import WhiteListRoundRobinPolicy
+from cassandra.cluster import ExecutionProfile
+from cassandra.cluster import EXEC_PROFILE_DEFAULT
 from cassandra.cluster import Cluster
 from cassandra.cluster import NoHostAvailable
 from cassandra.auth import PlainTextAuthProvider
@@ -41,7 +44,8 @@ def get_session(ip, port, username, password):
         auth_provider = None
 
     try:
-        cluster = Cluster([ip], port=port, auth_provider=auth_provider)
+        profiles = {EXEC_PROFILE_DEFAULT: ExecutionProfile(load_balancing_policy=WhiteListRoundRobinPolicy([ip]))}
+        cluster = Cluster([ip], port=port, auth_provider=auth_provider, execution_profiles=profiles)
         session = cluster.connect()
         return session
     except NoHostAvailable as e:
