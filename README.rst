@@ -10,6 +10,9 @@ https://github.com/amoskong/cqlping
 
 Help:
 ----
+
+cqlping --help
+
 .. code:: sh
 
     usage: cqlping [-h] [--debug] [-c C] [-i I] [--cqlport CQLPORT]
@@ -82,6 +85,7 @@ statement.
 Example:
 -------
 Found more examples in example.txt & test.sh
+
 .. code:: sh
 
     $ cqlping scylla-server
@@ -117,3 +121,4 @@ Found more examples in example.txt & test.sh
     cqlping DEBUG: reply data length: 6
     cqlping DEBUG: [Row(key='1', C0='CW6PZMH7', C1=None, C2=None, C3=None, C4=None)]
     cqlping INFO: 24 bytes scylla-server (127.0.0.1) seq=1 ttl=64 time=0.207 ms
+
