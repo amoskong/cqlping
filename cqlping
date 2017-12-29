@@ -36,6 +36,12 @@ logger.addHandler(handler)
 
 # Global connect session
 _session = None
+_schema_mode = 'default'
+
+
+def is_default_mode():
+    global _schema_mode
+    return _schema_mode == 'default'
 
 def get_session(ip, port, username, password):
     if username is not None:
@@ -78,13 +84,15 @@ def do_cql_ping(size, ttl, request_query=None, verify_query=None):
 
     # ping request
     args_list = []
-    if request_query is None:
+
+    if is_default_mode():
         request_query = "INSERT INTO cqlping.cf (key1, key2, val) VALUES (%s, %s, textAsBlob('%s'))"
         args_list =  [time_int1, time_int2]
     if '%s' in request_query:
         random_str = ''.join(random.choice(string.ascii_uppercase + string.digits) for _ in range(size))
         args_list.append(random_str)
         request_query = request_query % tuple(args_list)
+
     if ttl:
         request_query += " USING TTL %s" % ttl
 
@@ -92,29 +100,36 @@ def do_cql_ping(size, ttl, request_query=None, verify_query=None):
     _session.execute(request_query)
 
     # verify result of writing
-    if verify_query is None:
+    if is_default_mode() and verify_query is None:
         verify_query = 'select * from cqlping.cf where key1 = %s and key2 = %s' % (time_int1, time_int2)
-    logger.debug(verify_query)
-    ret = _session.execute(verify_query)
-    rows = list(_session.execute(verify_query))
-    logger.debug(rows)
-    logger.debug('reply data length: %d', get_packet_size(rows[0]))
-    return get_packet_size(rows[0])
+
+    if verify_query:
+        logger.debug(verify_query)
+        ret = _session.execute(verify_query)
+        rows = list(_session.execute(verify_query))
+        logger.debug(rows)
+        logger.debug('Verify data length: %d', get_packet_size(rows[0]))
+        ret_size = get_packet_size(rows[0])
+    else:
+        ret_size = data_size
+
+    return ret_size
 
 
 if __name__ == "__main__":
 
     parser = argparse.ArgumentParser(description="CQLPing - Simple CQL I/O latency monitoring tool")
     parser.add_argument('--debug', action="store_true", help="Enable debug mode (only for developer)")
-    parser.add_argument('-c', action="store", help="Stop after sending count ECHO_REQUEST packets", default=4)
-    parser.add_argument('-i', action="store", help="Wait interval seconds between each sending packet", default=1)
-    parser.add_argument('--cqlport', action="store", help="CQL port", default=9042)
-    parser.add_argument('--cqluser', action="store", help="CQL username")
-    parser.add_argument('--cqlpwd', action="store", help="CQL password")
-    parser.add_argument('--request-query', action="store", help="Request query for using existing schema", default=None)
-    parser.add_argument('--verify-query', action="store", help="(Optional) Verify the write(insert, update, delete) result by a select when use exiting schema", default=None)
-    parser.add_argument('-t', action="store", help="Time to live", default=64) #FIXME: unimplement
-    parser.add_argument('-s', action="store", help="(Optional) Size of random packet", default=None)
+    parser.add_argument('-c', action="store", help="Stop after sending count ECHO_REQUEST packets (default: 4)", default=4)
+    parser.add_argument('-i', action="store", help="Wait interval seconds between each sending packet (default: 1s)", default=1)
+    parser.add_argument('--cqlport', action="store", help="(Optional) CQL port (default: 9042)", default=9042)
+    parser.add_argument('--cqluser', action="store", help="(Optional) CQL username")
+    parser.add_argument('--cqlpwd', action="store", help="(Optional) CQL password")
+    parser.add_argument('--request-query', action="store", help="(Optional) Request query for using existing schema", default=None)
+    parser.add_argument('--verify-query', action="store", help="(Optional) Verify the write(INSERT/UPDATE/DELETE/ALTER) operate result by a SELECT when use exiting schema. Only used for debug mode", default=None)
+
+    parser.add_argument('-t', action="store", help="Time to live (default: 64)", default=64) #FIXME: unimplement
+    parser.add_argument('-s', action="store", help="(Optional) Size of random packet (default: 60)", default=None)
     parser.add_argument('destination', action="store", help="CqlPing packet destination", default='localhost')
     args = parser.parse_args()
 
@@ -133,16 +148,25 @@ if __name__ == "__main__":
 
     prepare_session(ip, port=int(args.cqlport), username=args.cqluser, password=args.cqlpwd)
 
-    if (args.request_query is None) and (args.verify_query is not None):
-        logger.error("request-query must be assigned when replay-query has been assigned")
+    if args.request_query is not None:
+        _schema_mode = 'exiting'
+
+    if args.verify_query is not None and not args.debug:
+        logger.error("verify-query can only be used in debug mode")
         sys.exit(1)
-    if args.request_query is None and args.verify_query is None:
-        logger.info("Prepare default schema cqlping.cf (key1 bigint, key2 bigint, val blob, PRIMARY KEY(key1, key2))")
-        prepare_default_schema()
-        if args.s is None:
-            args.s = 60
+
+    if is_default_mode():
+        if args.verify_query is not None:
+            logger.error("You don't need to assign verify-query in using default schema.")
+            sys.exit(1)
+        else:
+            logger.info("Prepare default schema cqlping.cf (key1 bigint, key2 bigint, val blob, PRIMARY KEY(key1, key2))")
+            logger.info("Current time will be assigned to primary key, each ping will increase a new row in cqlping.cf")
+            prepare_default_schema()
+            if args.s is None:
+                args.s = 60
     elif args.s and '%s' not in args.request_query:
-        logger.error("packet size is assigned, but there is no '%s' in request-query")
+        logger.error("Using existing schema, packet size is assigned, but there is no '%s' in request-query")
         sys.exit(1)
     elif args.s is None and '%s' in args.request_query:
         logger.error("request-query contains '%s', please assign packet size by `-s`")
