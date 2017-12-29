@@ -8,6 +8,7 @@ Simple CQL I/O latency monitoring tool
 
 Help:
 ----
+.. code:: sh
 
     $ cqlping --help
     usage: cqlping [-h] [-c C] [-i I] [--cqlport CQLPORT] [--cqluser CQLUSER]
@@ -31,6 +32,7 @@ Help:
 
 Example:
 -------
+.. code:: sh
 
     $ cqlping scylla-server --cqluser=cassandra --cqlpwd=cassandra
     CQLPing scylla-server (127.0.0.1), preparing...
