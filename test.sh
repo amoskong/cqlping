@@ -1,9 +1,9 @@
 #!/bin/bash
 
 echo "1. Test with default schema (self created cqlping.cf)"
-./cqlping scylla-server
+./cqlping scylla-server --debug
 
-2. echo "You should run cassandra-stress write ... to create keyspace1.standard1"
+echo "2. You should run cassandra-stress write ... to create keyspace1.standard1"
 
 echo "3. Test with keyspace1.standard1 created by C*-stress"
 
