@@ -61,3 +61,15 @@ Example:
     cqlping DEBUG: [Row(key1=1588084343092317, key2=1048576, val='Q1FQR0CG9NUBDEN3HPEMXMP4DI03NYB7Z83FM7MJBFL74Y3ZDNCIB2M55J5BGZR4TKEP3393H0GS958P8Y0OQ60WW53DNUO6LQZ1')]
     cqlping INFO: 116 bytes scylla-server (127.0.0.1) seq=1 ttl=64 time=0.180 ms
 
+    $ cqlping --cqluser=cassandra --cqlpwd=cassandra -s 8 -c 2 -i 0.1 scylla-server --request-query "INSERT INTO keyspace1.standard1 (key,\"C0\") VALUES (textAsBlob('1'), textAsBlob('%s'))" --reply-query "select * from keyspace1.standard1 where key=textAsBlob('1')" --debug
+    cqlping INFO: CQLPing scylla-server (127.0.0.1), preparing...
+    cqlping DEBUG: INSERT INTO keyspace1.standard1 (key,"C0") VALUES (textAsBlob('1'), textAsBlob('CW6PZMH7'))
+    cqlping DEBUG: select * from keyspace1.standard1 where key=textAsBlob('1')
+    cqlping DEBUG: reply data length: 6
+    cqlping DEBUG: [Row(key='1', C0='CW6PZMH7', C1=None, C2=None, C3=None, C4=None)]
+    cqlping INFO: 24 bytes scylla-server (127.0.0.1) seq=1 ttl=64 time=0.207 ms
+    cqlping DEBUG: INSERT INTO keyspace1.standard1 (key,"C0") VALUES (textAsBlob('1'), textAsBlob('REJSM11C'))
+    cqlping DEBUG: select * from keyspace1.standard1 where key=textAsBlob('1')
+    cqlping DEBUG: reply data length: 6
+    cqlping DEBUG: [Row(key='1', C0='REJSM11C', C1=None, C2=None, C3=None, C4=None)]
+    cqlping INFO: 24 bytes scylla-server (127.0.0.1) seq=2 ttl=64 time=0.198 ms
