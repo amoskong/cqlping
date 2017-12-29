@@ -182,7 +182,8 @@ if __name__ == "__main__":
             delta = time.time() - start_time
             if delta < interval:
                 time.sleep(interval - delta)
-            logger.info("%d bytes %s seq=%d ttl=%s time=%.3f ms" % (ret_size, dest_str, seq, args.t, delta))
+            logger.info("%s bytes %s seq=%d ttl=%s time=%.3f ms" % (ret_size if ret_size >0 else 'n/a',
+                                                                    dest_str, seq, args.t, delta))
             seq += 1
     except KeyboardInterrupt as e:
         sys.exit(1)
