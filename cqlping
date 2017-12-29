@@ -83,6 +83,8 @@ def do_cql_ping(size, ttl, request_query=None, reply_query=None):
         random_str = ''.join(random.choice(string.ascii_uppercase + string.digits) for _ in range(size))
         args_list.append(random_str)
         request_query = request_query % tuple(args_list)
+    if ttl:
+        request_query += " USING TTL %s" % ttl
 
     logger.debug(request_query)
     _session.execute(request_query)
