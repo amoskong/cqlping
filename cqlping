@@ -72,10 +72,8 @@ def get_packet_size(row):
 def do_cql_ping(size, ttl, request_query=None, reply_query=None):
     global _session
 
-    # emulate random delay
-    #import random
-    #n = random.randint(0, 100)
-    #time.sleep( n / 100.0)
+    # a pair of integers, whose ratio is exactly equal to the original float
+    # and with a positive denominator.
     (time_int1, time_int2) = time.time().as_integer_ratio()
 
     # ping request
@@ -108,16 +106,16 @@ def do_cql_ping(size, ttl, request_query=None, reply_query=None):
 if __name__ == "__main__":
 
     parser = argparse.ArgumentParser(description="CQLPing - Simple CQL I/O latency monitoring tool")
-    parser.add_argument('--debug', action="store_true", help="Enable debug mode")
+    parser.add_argument('--debug', action="store_true", help="Enable debug mode (only for developer)")
     parser.add_argument('-c', action="store", help="Stop after sending count ECHO_REQUEST packets", default=4)
     parser.add_argument('-i', action="store", help="Wait interval seconds between each sending packet", default=1)
     parser.add_argument('--cqlport', action="store", help="CQL port", default=9042)
     parser.add_argument('--cqluser', action="store", help="CQL username")
     parser.add_argument('--cqlpwd', action="store", help="CQL password")
-    parser.add_argument('--request-query', action="store", help="Request query", default=None)
-    parser.add_argument('--reply-query', action="store", help="Reply query", default=None)
+    parser.add_argument('--request-query', action="store", help="Request query for using existing schema", default=None)
+    parser.add_argument('--reply-query', action="store", help="Reply query for using exiting schema", default=None)
     parser.add_argument('-t', action="store", help="Time to live", default=64) #FIXME: unimplement
-    parser.add_argument('-s', action="store", help="Size of random packet", default=None)
+    parser.add_argument('-s', action="store", help="(Optional) Size of random packet", default=None)
     parser.add_argument('destination', action="store", help="CqlPing packet destination", default='localhost')
     args = parser.parse_args()
 
