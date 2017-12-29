@@ -97,7 +97,7 @@ if __name__ == "__main__":
 
     logger.info("CQLPing %s, preparing...", dest_str)
 
-    interval = int(args.i)
+    interval = float(args.i)
     data_size = int(args.s)
     head_size = 16 #two bigint keys
 
