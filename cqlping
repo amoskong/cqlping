@@ -104,7 +104,7 @@ if __name__ == "__main__":
     prepare(ip, port=int(args.cqlport), username=args.cqluser, password=args.cqlpwd)
 
     try:
-        cql_seq = 1
+        seq = 1
         for i in range(int(args.c)):
             start_time = time.time()
             do_cql_ping(data_size, int(args.t))
@@ -112,7 +112,7 @@ if __name__ == "__main__":
             delta = end_time - start_time
             if delta < interval:
                 time.sleep(interval - delta)
-            logger.info("%d bytes %s cql_seq=%d ttl=%s time=%.3f ms" % (data_size + head_size, dest_str, cql_seq, args.t, delta))
-            cql_seq += 1
+            logger.info("%d bytes %s seq=%d ttl=%s time=%.3f ms" % (data_size + head_size, dest_str, seq, args.t, delta))
+            seq += 1
     except KeyboardInterrupt as e:
         sys.exit(1)
