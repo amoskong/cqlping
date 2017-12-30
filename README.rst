@@ -18,6 +18,17 @@ Install:
     # ./cqlping --help
     # ./cqlping localhost
 
+Build RPM:
+----------
+Build rpm package
+
+.. code:: sh
+
+    # git clone https://github.com/amoskong/cqlping
+    # cd cqlping/
+    # ./dist/redhat/build_rpm.sh
+    # rpm -ivh ~/rpmbuild/RPMS/x86_64/cqlping-0.0.1-0.x86_64.rpm
+
 Help:
 ----
 
