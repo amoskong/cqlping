@@ -1,0 +1,40 @@
+Name:		cqlping
+Version:        @@VERSION@@
+Release:        @@RELEASE@@
+Summary:        CQLPing - Simple CQL I/O latency monitoring tool
+
+Source0:        %{name}-%{version}-%{release}.tar
+License:        AGPLv3
+URL:            https://github.com/amoskong/cqlping
+
+#BuildRequires:
+#Requires:
+
+%description
+CQLPing
+
+%prep
+%setup -q -n "%{name}-%{version}-%{release}"
+#FIXME: workaround a rpmbuild problem
+echo "" > configure
+chmod +x configure
+
+#%build
+
+%install
+rm -rf $RPM_BUILD_ROOT
+mkdir -p $RPM_BUILD_ROOT%{_bindir}
+mkdir -p $RPM_BUILD_ROOT%{_prefix}/lib/cqlping/
+
+install -m755 ./cqlping $RPM_BUILD_ROOT%{_bindir}
+install -m755 ./test.sh $RPM_BUILD_ROOT%{_prefix}/lib/cqlping/
+
+%files
+%defattr(-,root,root)
+%{_bindir}/cqlping
+%{_prefix}/lib/cqlping/test.sh
+%doc README.rst LICENSE example.txt
+
+%changelog
+* Sat Dec 30 2017 Amos Kong <amos@scylladb.com>
+- init the project
