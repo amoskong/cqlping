@@ -50,8 +50,11 @@ def get_session(ip, port, username, password):
         auth_provider = None
 
     try:
-        profiles = {EXEC_PROFILE_DEFAULT: ExecutionProfile(load_balancing_policy=WhiteListRoundRobinPolicy([ip]))}
-        cluster = Cluster([ip], port=port, auth_provider=auth_provider, execution_profiles=profiles)
+        wlrr = WhiteListRoundRobinPolicy([ip])
+        profiles = {EXEC_PROFILE_DEFAULT: ExecutionProfile(load_balancing_policy=wlrr)}
+        cluster = Cluster([ip], port=port, auth_provider=auth_provider,
+                          execution_profiles=profiles)
+        # timeout:        connect_timeout=2, max_schema_agreement_wait=2, control_connection_timeout=2)
         session = cluster.connect()
         return session
     except NoHostAvailable as e:
@@ -121,13 +124,22 @@ if __name__ == "__main__":
 
     parser = argparse.ArgumentParser(description="CQLPing - Simple CQL I/O latency monitoring tool")
     parser.add_argument('--debug', action="store_true", help="Enable debug mode (only for developer)")
-    parser.add_argument('-c', action="store", help="Stop after sending count ECHO_REQUEST packets (default: 4)", default=4)
-    parser.add_argument('-i', action="store", help="Wait interval seconds between each sending packet (default: 1s)", default=1)
-    parser.add_argument('--cqlport', action="store", help="(Optional) CQL port (default: 9042)", default=9042)
+    parser.add_argument('-c', action="store",
+                        help="Stop after sending count ECHO_REQUEST packets (default: 4)",
+                        default=4)
+    parser.add_argument('-i', action="store",
+                        help="Wait interval seconds between each sending packet (default: 1s)",
+                        default=1)
+    parser.add_argument('--cqlport', action="store", help="(Optional) CQL port (default: 9042)",
+                        default=9042)
     parser.add_argument('--cqluser', action="store", help="(Optional) CQL username")
     parser.add_argument('--cqlpwd', action="store", help="(Optional) CQL password")
-    parser.add_argument('--request-query', action="store", help="(Optional) Request query for using existing schema", default=None)
-    parser.add_argument('--verify-query', action="store", help="(Optional) Verify the write(INSERT/UPDATE/DELETE/ALTER) operate result by a SELECT when use exiting schema. Only used for debug mode", default=None)
+    parser.add_argument('--request-query', action="store",
+                        help="(Optional) Request query for using existing schema",
+                        default=None)
+    parser.add_argument('--verify-query', action="store",
+                        help="(Optional) Verify the write(INSERT/UPDATE/DELETE/ALTER) operate result by a SELECT when use exiting schema. Only used for debug mode",
+                        default=None)
 
     parser.add_argument('-t', action="store", help="Time to live (default: 64)", default=64) #FIXME: unimplement
     parser.add_argument('-s', action="store", help="(Optional) Size of random packet (default: 60)", default=None)
