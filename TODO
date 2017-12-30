@@ -4,3 +4,12 @@
 If user don't use random string and veiry-query isn't used,
 we need to get the packet size from first query.
 
+2. end summary
+
+--- baidu.com ping statistics ---
+2 packets transmitted, 2 packets received, 0.0% packet loss
+round-trip min/avg/max/stddev = 21.275/21.575/21.875/0.300 ms
+
+3. support multiple queries (SELECT/DELETE/UPDATE/INSERT/ALTER)
+delete -> prepare data first, then delete one by one
+alter -> update by request-query, recover by verify-query?
